@@ -51,6 +51,7 @@
     <string name="account_create_server_not_select">没有认证服务器</string>
     <string name="account_login">登录</string>
     <string name="account_methods_offline">离线账户</string>
+    <string name="account_methods_littleskin">LittleSkin账户</string>
     <string name="account_methods_offline_name_invalid">通常情况下，用户名只能包含英文字符，数字和下划线，且长度不得超过 16 个字符。\n一些有效的名称：Tungsten，Tungsten_123；\n一些无效的名称：Exam ple，Exam-a_%%%，Tungsten_hello_world_hello_world。\n如果你有相关模组或插件可以解除此限制，你可以忽略此警告。</string>
     <string name="account_methods_yggdrasil">Mojang 账户</string>
     <string name="account_methods_authlib_injector">外置账户</string>
@@ -1190,4 +1191,5 @@
     <string name="swap_hands">双击切换副手</string>
     <string name="jar_executor_warn">注意！该功能不是用于安装模组的，如果你正在安装模组，请使用启动器的下载功能或是在“管理模组”内添加。</string>
 
+    <string name="launch_no_account">请先登录账户</string>
 </resources>

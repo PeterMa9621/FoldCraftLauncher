@@ -44,6 +44,7 @@
     <string name="account_injector_server">Servidor de autenticação</string>
     <string name="account_login">Login</string>
     <string name="account_methods_offline">Conta offline</string>
+    <string name="account_methods_littleskin">Conta LittleSkin</string>
     <string name="account_methods_offline_name_invalid">O nome de usuário deve conter apenas letras, números e underline, e no máximo 16 caracteres.\nPossíveis nomes de usuário: Tungsten, Tungsten_123;\nNomes de usuário não permitido: Exam ple, Exam-a_%%%, Tungsten_hello_world_hello_world.\nSe houver algum mod ou plugin no servidor que possa remover esta restrição, ignore este aviso.</string>
     <string name="account_methods_yggdrasil">Conta Mojang</string>
     <string name="account_methods_authlib_injector">Conta externa</string>
@@ -929,4 +930,5 @@ desfeita!</string>
     <string name="world_reveal">Mostrar no explorador</string>
     <string name="world_show_all">Mostrar tudo</string>
     <string name="world_time">EEE, MMM d, yyyy HH:mm:ss</string>
+    <string name="launch_no_account">Faça login em uma conta primeiro</string>
 </resources>

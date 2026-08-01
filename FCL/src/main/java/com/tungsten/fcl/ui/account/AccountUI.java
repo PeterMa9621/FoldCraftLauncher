@@ -2,7 +2,6 @@ package com.tungsten.fcl.ui.account;
 
 import android.content.Context;
 import android.view.View;
-import android.widget.ListView;
 
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -10,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tungsten.fcl.R;
 import com.tungsten.fcl.setting.Accounts;
+import com.tungsten.fcl.setting.AuthlibInjectorServers;
+import com.tungsten.fclcore.auth.authlibinjector.AuthlibInjectorServer;
 import com.tungsten.fclcore.task.Task;
 import com.tungsten.fcllibrary.component.ui.FCLCommonUI;
 import com.tungsten.fcllibrary.component.view.FCLUILayout;
@@ -43,9 +44,6 @@ public class AccountUI extends FCLCommonUI implements View.OnClickListener {
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        ListView serverListView = findViewById(R.id.server_list);
-        serverListView.setAdapter(new ServerListAdapter(getContext()));
     }
 
     @Override
@@ -75,7 +73,9 @@ public class AccountUI extends FCLCommonUI implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view == addOfflineAccount) {
-            CreateAccountDialog dialog = new CreateAccountDialog(getContext(), Accounts.FACTORY_OFFLINE);
+            // 原“离线账户”入口已改为 LittleSkin 账户：打开默认认证服务器的登录/创建对话框
+            AuthlibInjectorServer server = Accounts.getOrCreateAuthlibInjectorServer(AuthlibInjectorServers.DEFAULT_SERVER_URL);
+            CreateAccountDialog dialog = new CreateAccountDialog(getContext(), server);
             dialog.show();
         }
         if (view == addMicrosoftAccount) {

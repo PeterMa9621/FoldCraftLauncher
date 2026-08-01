@@ -208,7 +208,9 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
                     controller.setOnSelectListener(this@MainActivity)
                     multiplayer.setOnSelectListener(this@MainActivity)
                     setting.setOnSelectListener(this@MainActivity)
-                    home.setSelected(true)
+                    // 启动初始化完成后直接显示账户页面（不选中 home 菜单，避免主页闪现）
+                    title.setTextWithAnim(getString(R.string.account))
+                    uiManager.switchUI(uiManager.accountUI)
                     home.setOnLongClickListener {
                         shareLog()
                         true
@@ -368,6 +370,15 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
                 uiManager.onBackPressed()
             }
             if (view === start) {
+                if (Accounts.getSelectedAccount() == null) {
+                    // 尚未登录：提示先登录，并引导用户到账户页面添加账户
+                    refreshMenuView(null)
+                    title.setTextWithAnim(getString(R.string.launch_no_account))
+                    AnimUtil.playTranslationX(start, 700, 0f, 50f, -50f, 50f, -50f, 0f)
+                        .interpolator(OvershootInterpolator()).start()
+                    uiManager.switchUI(uiManager.accountUI)
+                    return
+                }
                 if (!Controllers.isInitialized()) {
                     title.setTextWithAnim(getString(R.string.message_loading_controllers))
                     AnimUtil.playTranslationX(start, 700, 0f, 50f, -50f, 50f, -50f, 0f)

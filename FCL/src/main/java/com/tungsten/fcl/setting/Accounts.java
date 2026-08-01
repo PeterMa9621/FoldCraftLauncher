@@ -415,7 +415,7 @@ public final class Accounts {
         };
     }
 
-    private static AuthlibInjectorServer getOrCreateAuthlibInjectorServer(String url) {
+    public static AuthlibInjectorServer getOrCreateAuthlibInjectorServer(String url) {
         return config().getAuthlibInjectorServers().stream()
                 .filter(server -> url.equals(server.getUrl()))
                 .findFirst()

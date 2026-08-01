@@ -63,6 +63,7 @@
     <string name="account_injector_server">Authentication Server</string>
     <string name="account_login">Login</string>
     <string name="account_methods_offline">Offline Account</string>
+    <string name="account_methods_littleskin">LittleSkin Account</string>
     <string name="account_methods_offline_name_invalid">Under normal circumstances, the game username can only contain English characters, numbers and underscores, and the length cannot exceed 16 characters.\nSome legitimate usernames: Tungsten, Tungsten_123;\nSome illegal usernames: Exam ple, Exam-a_%%%, Tungsten_hello_world_hello_world.\nIf you believe that there is a corresponding mod or plugin on the server side to remove this restriction, you can ignore this warning.</string>
     <string name="account_methods_yggdrasil">Mojang Account</string>
     <string name="account_methods_authlib_injector">External Account</string>
@@ -1254,4 +1255,5 @@
     <string name="slide_selection">Slide Selection</string>
     <string name="swap_hands">Double Tap Swap Hands</string>
     <string name="jar_executor_warn">Note! This feature is not for installing mods. If you are installing mods, please use the launcher\'s download function or add them in "Manage Mods".</string>
+    <string name="launch_no_account">Please log in to an account first</string>
 </resources>

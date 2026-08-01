@@ -44,6 +44,7 @@
     <string name="account_injector_server">Сервер автентифікації</string>
     <string name="account_login">Увійти</string>
     <string name="account_methods_offline">Офлайн-обліковий запис</string>
+    <string name="account_methods_littleskin">Обліковий запис LittleSkin</string>
     <string name="account_methods_offline_name_invalid">"Ім’я користувача (до 16 символів) має складатися з латинських літер, цифр і символів підкреслення. \nДеякі припустимі імена: Llerey, Tungsten, Tungsten123; \nДеякі неприпустимі імена: Exam ple, Exam-a%%%, Tungsten_hello_world_hello_world. Якщо на сервері є мод, який знімає ці обмеження, ви можете ігнорувати це попередження."</string>
     <string name="account_methods_yggdrasil">Обліковий запис Mojang</string>
     <string name="account_methods_authlib_injector">Зовнішній обліковий запис</string>
@@ -931,4 +932,5 @@
     <string name="tip_hide_menu_view">Меню приховано. Натисніть клавішу гучності, щоб відкрити меню.</string>
     <string name="modloader">Завантажувач модів</string>
     <string name="message_warn_renderer_global_setting">Вибрана вами версія має окремі налаштування для кожного профілю, тому вказаний тут рендерер не може бути застосований до поточної версії. Рекомендується тривале натискання кнопки "Запуск" для вибору рендерера.</string>
+    <string name="launch_no_account">Спочатку увійдіть в обліковий запис</string>
 </resources>

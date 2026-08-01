@@ -44,6 +44,7 @@
     <string name="account_injector_server">Authentifizierungsserver</string>
     <string name="account_login">Anmelden</string>
     <string name="account_methods_offline">Offline-Konto</string>
+    <string name="account_methods_littleskin">LittleSkin-Konto</string>
     <string name="account_methods_offline_name_invalid">"Benutzername (bis zu 16 Zeichen) darf nur lateinische Buchstaben, Zahlen und Unterstriche enthalten. \nBeispiele für gültige Namen: Llerey, Tungsten, Tungsten123; \nBeispiele für ungültige Namen: Exam ple, Exam-a%%%, Tungsten_hello_world_hello_world. Wenn ein Mod auf dem Server diese Einschränkungen aufhebt, können Sie diese Warnung ignorieren."</string>
     <string name="account_methods_yggdrasil">Mojang-Konto</string>
     <string name="account_methods_authlib_injector">Externes Konto</string>
@@ -914,4 +915,5 @@
     <string name="tip_hide_menu_view">Menü ist ausgeblendet. Drücken Sie die Lautstärketaste, um das Menü zu öffnen.</string>
     <string name="modloader">Mod-Loader</string>
     <string name="message_warn_renderer_global_setting">Die von Ihnen gewählte Version hat separate Einstellungen für jedes Profil, daher kann der hier angegebene Renderer nicht auf die aktuelle Version angewendet werden. Es wird empfohlen, die "Starten"-Taste lange zu drücken, um den Renderer auszuwählen.</string>
+    <string name="launch_no_account">Bitte melde dich zuerst bei einem Konto an</string>
 </resources>

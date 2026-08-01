@@ -47,6 +47,7 @@
     <string name="account_create_server_not_select">冇認證伺服器</string>
     <string name="account_login">登錄</string>
     <string name="account_methods_offline">離線賬戶</string>
+    <string name="account_methods_littleskin">LittleSkin賬戶</string>
     <string name="account_methods_offline_name_invalid">通常情況下，用戶名只能包含英文字符，數字同下劃線，且長度不得超過 16 個字符。\n一啲有效嘅名稱：Tungsten，Tungsten_123；\n一啲無效嘅名稱：Exam ple，Exam-a_%%%，Tungsten_hello_world_hello_world。\n如果你有相關模組或插件可以解除此限制，你可以忽略此警告。</string>
     <string name="account_methods_yggdrasil">Mojang 賬戶</string>
     <string name="account_methods_authlib_injector">外置賬戶</string>
@@ -1040,4 +1041,5 @@
     <string name="message_select_url">請選擇一個鏈接進行下載（將會跳轉至瀏覽器）</string>
     <string name="supported_mc_version">支持嘅MC版本：</string>
     <string name="message_check_renderer">當前渲染器 %s 唔支持該遊戲版本，繼續使用可能導致渲染錯誤或遊戲崩潰！是否繼續？</string>
+    <string name="launch_no_account">請先登入賬戶</string>
 </resources>

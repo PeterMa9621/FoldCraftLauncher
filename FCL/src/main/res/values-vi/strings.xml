@@ -61,6 +61,7 @@
     <string name="account_injector_server">Máy chủ xác thực</string>
     <string name="account_login">Đăng nhập</string>
     <string name="account_methods_offline">Tài khoản ngoại tuyến</string>
+    <string name="account_methods_littleskin">Tài khoản LittleSkin</string>
     <string name="account_methods_offline_name_invalid">Trong điều kiện bình thường, tên người dùng trò chơi chỉ có thể chứa ký tự tiếng Anh, số và dấu gạch dưới, và độ dài không được vượt quá 16 ký tự.\nMột số tên người dùng hợp lệ: Tungsten, Tungsten_123;\nMột số tên người dùng không hợp lệ: Exam ple, Exam-a_%%%, Tungsten_hello_world_hello_world.\nNếu bạn tin rằng có mod hoặc plugin tương ứng ở phía máy chủ để xóa giới hạn này, bạn có thể bỏ qua cảnh báo này.</string>
     <string name="account_methods_yggdrasil">Tài khoản Mojang</string>
     <string name="account_methods_authlib_injector">Tài khoản bên ngoài</string>
@@ -1252,4 +1253,5 @@
     <string name="slide_selection">Lựa chọn Trượt</string>
     <string name="swap_hands">Nhấp đúp để Đổi Tay</string>
     <string name="jar_executor_warn">Lưu ý! Tính năng này không dành cho việc cài đặt mods. Nếu bạn đang cài đặt mods, vui lòng sử dụng chức năng tải xuống của trình khởi chạy hoặc thêm chúng trong "Quản lý Mods".</string>
+    <string name="launch_no_account">Vui lòng đăng nhập tài khoản trước</string>
 </resources>
