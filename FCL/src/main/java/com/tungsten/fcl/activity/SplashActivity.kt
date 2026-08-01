@@ -3,7 +3,6 @@ package com.tungsten.fcl.activity
 import android.Manifest.permission
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -14,7 +13,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
@@ -56,33 +54,17 @@ class SplashActivity : FCLActivity() {
     var java21: Boolean = false
     var java25: Boolean = false
     var jna: Boolean = false
-    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
         setContentView(R.layout.activity_splash)
-        sharedPreferences = getSharedPreferences("launcher", MODE_PRIVATE)
         val background = findViewById<ConstraintLayout>(R.id.background)
         ImageUtil.loadInto(
             background,
             ThemeEngine.getInstance().getTheme().getBackground(this)
         )
-        if (sharedPreferences.getBoolean("isAgree", false)) {
-            checkPermission()
-        } else {
-            FCLAlertDialog.Builder(this).apply {
-                setCancelable(false)
-                setAlertLevel(FCLAlertDialog.AlertLevel.ALERT)
-                setMessage(getString(R.string.splash_agreement))
-                setPositiveButton {
-                    sharedPreferences.edit { putBoolean("isAgree", true) }
-                    checkPermission()
-                }
-                setNegativeButton(getString(com.tungsten.fcllibrary.R.string.crash_reporter_close)) { finish() }
-                create().show()
-            }
-        }
+        checkPermission()
     }
 
     private fun checkPermission() {
