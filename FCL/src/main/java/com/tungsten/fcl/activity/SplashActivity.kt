@@ -22,20 +22,22 @@ import com.mio.JavaManager
 import com.mio.manager.RendererManager
 import com.mio.util.ImageUtil
 import com.tungsten.fcl.R
-import com.tungsten.fcl.fragment.EulaFragment
-import com.tungsten.fcl.fragment.RuntimeFragment
 import com.tungsten.fcl.setting.ConfigHolder
 import com.tungsten.fcl.util.AndroidUtils
 import com.tungsten.fcl.util.RuntimeUtils
+import com.tungsten.fclauncher.utils.Architecture
 import com.tungsten.fclauncher.utils.FCLPath
 import com.tungsten.fclcore.util.Logging
 import com.tungsten.fclcore.util.io.FileUtils
 import com.tungsten.fcllibrary.component.FCLActivity
 import com.tungsten.fcllibrary.component.dialog.FCLAlertDialog
 import com.tungsten.fcllibrary.component.theme.ThemeEngine
+import com.tungsten.fcllibrary.ui.ProgressDialog
 import com.tungsten.fcllibrary.util.LocaleUtils
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -108,20 +110,106 @@ class SplashActivity : FCLActivity() {
             if (lwjgl && cacio && cacio17 && java8 && java17 && java21 && java25 && jna) {
                 enterLauncher()
             } else {
-                start()
+                autoInstallRuntimes()
             }
         }
     }
 
-    fun start() {
-        if (sharedPreferences.getBoolean("isFirstLaunch", true)) {
-            supportFragmentManager.beginTransaction()
-                .setCustomAnimations(R.anim.frag_start_anim, R.anim.frag_stop_anim)
-                .replace(R.id.fragment, EulaFragment::class.java, null).commit()
-        } else {
-            supportFragmentManager.beginTransaction()
-                .setCustomAnimations(R.anim.frag_start_anim, R.anim.frag_stop_anim)
-                .replace(R.id.fragment, RuntimeFragment::class.java, null).commit()
+    private fun autoInstallRuntimes() {
+        val deviceArch = Architecture.archAsString(Architecture.getDeviceArchitecture())
+        if (!isJavaArchSupported(deviceArch)) {
+            FCLAlertDialog.Builder(this)
+                .setMessage(
+                    getString(
+                        R.string.missing_runtime_arch_files,
+                        deviceArch,
+                        "FCL-release-x.x.x.x-$deviceArch.apk",
+                        "FCL-release-x.x.x.x-all.apk"
+                    )
+                )
+                .setPositiveButton { }
+                .create()
+                .show()
+            return
+        }
+        val progress = ProgressDialog(this, getString(R.string.splash_preparing))
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                val jobs = mutableListOf<Deferred<Boolean>>()
+                if (!lwjgl) jobs.add(async {
+                    runCatching {
+                        RuntimeUtils.install(this@SplashActivity, FCLPath.LWJGL_DIR, "app_runtime/lwjgl")
+                    }.isSuccess
+                })
+                if (!cacio) jobs.add(async {
+                    runCatching {
+                        RuntimeUtils.install(this@SplashActivity, FCLPath.CACIOCAVALLO_8_DIR, "app_runtime/caciocavallo")
+                    }.isSuccess
+                })
+                if (!cacio17) jobs.add(async {
+                    runCatching {
+                        RuntimeUtils.install(this@SplashActivity, FCLPath.CACIOCAVALLO_17_DIR, "app_runtime/caciocavallo17")
+                    }.isSuccess
+                })
+                if (!java8) jobs.add(async {
+                    runCatching {
+                        RuntimeUtils.installJava(this@SplashActivity, FCLPath.JAVA_8_PATH, "app_runtime/java/jre8")
+                    }.isSuccess
+                })
+                if (!java17) jobs.add(async {
+                    runCatching {
+                        RuntimeUtils.installJava(this@SplashActivity, FCLPath.JAVA_17_PATH, "app_runtime/java/jre17")
+                    }.isSuccess
+                })
+                if (!java21) jobs.add(async {
+                    runCatching {
+                        RuntimeUtils.installJava(this@SplashActivity, FCLPath.JAVA_21_PATH, "app_runtime/java/jre21")
+                    }.isSuccess
+                })
+                if (!java25) jobs.add(async {
+                    runCatching {
+                        RuntimeUtils.installJava(this@SplashActivity, FCLPath.JAVA_25_PATH, "app_runtime/java/jre25")
+                    }.isSuccess
+                })
+                if (!jna) jobs.add(async {
+                    runCatching {
+                        RuntimeUtils.installJna(this@SplashActivity, FCLPath.JNA_PATH, "app_runtime/jna")
+                    }.isSuccess
+                })
+                jobs.awaitAll()
+            }
+            withContext(Dispatchers.IO) { initState() }
+            progress.dismiss()
+            if (lwjgl && cacio && cacio17 && java8 && java17 && java21 && java25 && jna) {
+                enterLauncher()
+            } else {
+                FCLAlertDialog.Builder(this@SplashActivity)
+                    .setCancelable(false)
+                    .setAlertLevel(FCLAlertDialog.AlertLevel.ALERT)
+                    .setMessage(getString(R.string.splash_runtime_install_failed))
+                    .setPositiveButton { autoInstallRuntimes() }
+                    .setNegativeButton { finish() }
+                    .create()
+                    .show()
+            }
+        }
+    }
+
+    private fun isJavaArchSupported(arch: String): Boolean {
+        return try {
+            val javaDirs = listOf("jre8", "jre17", "jre21", "jre25")
+            var supportedCount = 0
+            for (javaDir in javaDirs) {
+                val dirPath = "app_runtime/java/$javaDir"
+                val files = assets.list(dirPath)
+                if (files != null && files.contains("bin-$arch.tar.xz")) {
+                    supportedCount++
+                }
+            }
+            supportedCount > 0
+        } catch (e: Exception) {
+            Logging.LOG.log(Level.WARNING, "Failed to check java arch support: ${e.message}")
+            false
         }
     }
 
