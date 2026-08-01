@@ -115,7 +115,7 @@ public final class NetworkUtils {
             connection.setRequestProperty("User-Agent", "pan.baidu.com");
         } else {
             // Default
-            connection.setRequestProperty("User-Agent", "FCL/" + FCLPath.CONTEXT.getString(R.string.app_version));
+            connection.setRequestProperty("User-Agent", "PX/" + FCLPath.CONTEXT.getString(R.string.app_version));
         }
         connection.setUseCaches(false);
         connection.setConnectTimeout(TIME_OUT);

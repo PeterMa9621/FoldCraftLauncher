@@ -109,7 +109,7 @@ androidComponents {
             if (output is com.android.build.api.variant.impl.VariantOutputImpl) {
                 (output.getFilter(ABI)?.identifier ?: "all").let { abi ->
                     output.outputFileName =
-                        "FCL-${variant.buildType}-${project.android.defaultConfig.versionName}-${abi}.apk"
+                        "PX-${variant.buildType}-${project.android.defaultConfig.versionName}-${abi}.apk"
                 }
 
                 val variantName = variant.name.replaceFirstChar { it.uppercaseChar() }

@@ -104,7 +104,7 @@ public class Datapack {
                 Files.write(packMcMeta, Arrays.asList("{",
                         "\t\"pack\": {",
                         "\t\t\"pack_format\": 4,",
-                        "\t\t\"description\": \"Modified by FCL.\"",
+                        "\t\t\"description\": \"Modified by PX.\"",
                         "\t}",
                         "}"), StandardOpenOption.CREATE);
 

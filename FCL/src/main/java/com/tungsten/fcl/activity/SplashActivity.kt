@@ -123,8 +123,8 @@ class SplashActivity : FCLActivity() {
                     getString(
                         R.string.missing_runtime_arch_files,
                         deviceArch,
-                        "FCL-release-x.x.x.x-$deviceArch.apk",
-                        "FCL-release-x.x.x.x-all.apk"
+                        "PX-release-x.x.x.x-$deviceArch.apk",
+                        "PX-release-x.x.x.x-all.apk"
                     )
                 )
                 .setPositiveButton { }

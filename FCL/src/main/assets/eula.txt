@@ -1,10 +1,10 @@
-Fold Craft Launcher end-user license agreements
+X 计划 end-user license agreements
 
 Before you using the software, please read the eula first.
 The software is developed by FCL-Team.
 
 1. User's obligations
-1) Get a qualified device, FCL requires Android 8.0 or higher.
+1) Get a qualified device, PX requires Android 8.0 or higher.
 2) Pay for the cost of Internet access and other services.
 3) Take responsibility for all the consequences of your own use of the software.
 

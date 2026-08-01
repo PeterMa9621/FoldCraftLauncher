@@ -223,7 +223,7 @@ public class FCLBridge implements Serializable {
 
     public void setPrimaryClipString(String string) {
         ClipboardManager clipboard = (ClipboardManager) FCLPath.CONTEXT.getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("FCL Clipboard", string);
+        ClipData clip = ClipData.newPlainText("PX Clipboard", string);
         clipboard.setPrimaryClip(clip);
     }
 

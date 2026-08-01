@@ -251,7 +251,7 @@ public class FileBrowserActivity extends FCLActivity implements View.OnClickList
         }
         if (view == openExternal) {
             if (currentPath.toFile().getAbsolutePath().equals(Environment.getExternalStorageDirectory().getAbsolutePath())) {
-                currentPath = currentPath.resolve("FCL");
+                currentPath = currentPath.resolve("PX");
             }
             Uri uri = FileProvider.getUriForFile(this, getApplication().getPackageName() + ".provider", currentPath.toFile());
             Intent intent = new Intent(Intent.ACTION_SEND);

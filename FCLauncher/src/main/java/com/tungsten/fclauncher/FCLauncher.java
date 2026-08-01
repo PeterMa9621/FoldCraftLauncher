@@ -59,9 +59,9 @@ public class FCLauncher {
         try {
             PackageInfo packageInfo = pm.getPackageInfo(config.getContext().getPackageName(), 0);
             FCL_VERSION_CODE = packageInfo.versionCode;
-            log(bridge, "FCL Version Code: " + FCL_VERSION_CODE);
+            log(bridge, "PX Version Code: " + FCL_VERSION_CODE);
         } catch (PackageManager.NameNotFoundException e) {
-            log(bridge, "FCL Version Code: Can't get current version code, exception = " + e.getMessage());
+            log(bridge, "PX Version Code: Can't get current version code, exception = " + e.getMessage());
         }
     }
 

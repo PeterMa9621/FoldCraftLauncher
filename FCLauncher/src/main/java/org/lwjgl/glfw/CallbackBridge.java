@@ -123,7 +123,7 @@ public class CallbackBridge {
         String result = null;
         switch (type) {
             case CLIPBOARD_COPY:
-                ClipData clip = ClipData.newPlainText("FCL Clipboard", copy);
+                ClipData clip = ClipData.newPlainText("PX Clipboard", copy);
                 clipboard.setPrimaryClip(clip);
                 break;
             case CLIPBOARD_PASTE:
