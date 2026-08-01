@@ -37,6 +37,7 @@ import com.tungsten.fcl.FCLApplication;
 import com.tungsten.fcl.R;
 import com.tungsten.fcl.setting.Profile;
 import com.tungsten.fcl.setting.VersionSetting;
+import com.tungsten.fcl.ui.download.ModpackManager;
 import com.tungsten.fcl.util.AndroidUtils;
 import com.tungsten.fclauncher.bridge.FCLBridge;
 import com.tungsten.fclauncher.utils.FCLPath;
@@ -351,6 +352,13 @@ public class FCLGameRepository extends DefaultGameRepository {
     public LaunchOptions getLaunchOptions(String version, JavaVersion javaVersion, File gameDir, double scaleFactor) {
         VersionSetting vs = getVersionSetting(version);
         initForceResolution(vs);
+        // Expose the modpack's target server to the game as a JVM system property, read
+        // by custom mods (mirrors the desktop launcher's -DtargetServer mechanism).
+        List<String> javaArguments = new ArrayList<>(StringUtils.tokenize(vs.getJavaArgs()));
+        String targetServer = ModpackManager.getInstance().getServer();
+        if (targetServer != null && !targetServer.trim().isEmpty()) {
+            javaArguments.add("-DtargetServer=" + targetServer);
+        }
         LaunchOptions.Builder builder = new LaunchOptions.Builder()
                 .setGameDir(gameDir)
                 .setJava(javaVersion)
@@ -358,7 +366,7 @@ public class FCLGameRepository extends DefaultGameRepository {
                 .setVersionName(version)
                 .setProfileName(FCLPath.CONTEXT.getString(R.string.app_name))
                 .setGameArguments(StringUtils.tokenize(vs.getMinecraftArgs()))
-                .setJavaArguments(StringUtils.tokenize(vs.getJavaArgs()))
+                .setJavaArguments(javaArguments)
                 .setMaxMemory((int) (getAllocatedMemory(
                         vs.getMaxMemory() * 1024L * 1024L,
                         MemoryUtils.getFreeDeviceMemory(FCLPath.CONTEXT) * 1024L * 1024L,

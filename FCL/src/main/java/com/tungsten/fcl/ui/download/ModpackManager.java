@@ -4,13 +4,16 @@ import android.content.Context;
 
 import com.tungsten.fcl.R;
 import com.tungsten.fcl.setting.DownloadProviders;
+import com.tungsten.fcl.setting.Profile;
 import com.tungsten.fcl.setting.Profiles;
 import com.tungsten.fcl.ui.TaskDialog;
 import com.tungsten.fcl.util.TaskCancellationAction;
 import com.tungsten.fclauncher.utils.FCLPath;
 import com.tungsten.fclcore.download.GameBuilder;
+import com.tungsten.fclcore.download.LibraryAnalyzer;
 import com.tungsten.fclcore.download.RemoteVersion;
 import com.tungsten.fclcore.download.VersionList;
+import com.tungsten.fclcore.game.Version;
 import com.tungsten.fclcore.task.FileDownloadTask;
 import com.tungsten.fclcore.task.Schedulers;
 import com.tungsten.fclcore.task.Task;
@@ -123,6 +126,43 @@ public class ModpackManager {
     private boolean isModpackInfoReady() {
         MjyModPackageList mod = mjyModPackageList;
         return mjyPackageList != null && mod != null && mod.tasks != null;
+    }
+
+    /**
+     * Resolve the target server address (host:port) declared by the modpack manifest.
+     * <p>
+     * Mirrors the desktop launcher's behaviour: {@code ManifestInfoEnumerator} copies
+     * {@code manifest.server} into the package info and {@code LauncherFrame} passes it
+     * to the game as the {@code -DtargetServer} system property. Custom mods read that
+     * property to know which server to display / connect to.
+     *
+     * @return the server address, or {@code null} when the manifest declares none.
+     */
+    public String getServer() {
+        MjyModPackageList mod = mjyModPackageList;
+        if (mod != null && mod.server != null && !mod.server.trim().isEmpty()) {
+            return mod.server;
+        }
+        MjyPackageList pk = mjyPackageList;
+        if (pk != null && pk.packages != null && !pk.packages.isEmpty()
+                && pk.packages.get(0).server != null && !pk.packages.get(0).server.trim().isEmpty()) {
+            return pk.packages.get(0).server;
+        }
+        // Fall back to the locally persisted package list so the server address is still
+        // available when launching offline (remote manifest unreachable).
+        try {
+            File mjypks = new File(fn);
+            if (mjypks.exists()) {
+                MjyPackageList local = JsonUtils.GSON.fromJson(FileUtils.readText(mjypks), MjyPackageList.class);
+                if (local != null && local.packages != null && !local.packages.isEmpty()
+                        && local.packages.get(0).server != null && !local.packages.get(0).server.trim().isEmpty()) {
+                    return local.packages.get(0).server;
+                }
+            }
+        } catch (Exception e) {
+            Logging.LOG.log(Level.WARNING, "Unable to read server from local modpack marker", e);
+        }
+        return null;
     }
 
     // ---------------------------------------------------------------------
@@ -274,6 +314,34 @@ public class ModpackManager {
     // ---------------------------------------------------------------------
 
     /**
+     * Determine whether the currently selected version is a proper install of this
+     * modpack, i.e. a Forge build of the exact game version the manifest targets.
+     * <p>
+     * A leftover / stale version (for example a plain vanilla install from a previously
+     * interrupted setup) would otherwise be launched as-is, producing a game without
+     * Forge and without any of the modpack's mods. When this returns {@code false} the
+     * caller reinstalls the game body from scratch.
+     */
+    private boolean isGameReady(String modpackGameVersion) {
+        try {
+            Profile profile = Profiles.getSelectedProfile();
+            String selectedVersion = profile.getSelectedVersion();
+            if (selectedVersion == null || !profile.getRepository().hasVersion(selectedVersion)) {
+                return false;
+            }
+            String installedGameVersion = profile.getRepository().getGameVersion(selectedVersion).orElse(null);
+            Version resolved = profile.getRepository().getResolvedVersion(selectedVersion);
+            LibraryAnalyzer analyzer = LibraryAnalyzer.analyze(resolved, installedGameVersion);
+            return analyzer.has(LibraryAnalyzer.LibraryType.FORGE)
+                    && modpackGameVersion != null
+                    && modpackGameVersion.equals(installedGameVersion);
+        } catch (Exception e) {
+            Logging.LOG.log(Level.WARNING, "Unable to verify the installed game version, will reinstall", e);
+            return false;
+        }
+    }
+
+    /**
      * Check the remote modpack, download / update it when necessary (showing a progress
      * dialog), and run {@code launchAction} as soon as the modpack is ready.
      * <p>
@@ -286,13 +354,22 @@ public class ModpackManager {
         }
         busy = true;
 
+        // The modpack files are downloaded into the shared .minecraft directory, so the
+        // game must run from that same directory rather than an isolated per-version
+        // folder; otherwise none of the downloaded mods/configs would be loaded and a
+        // "bare" game would start. Legacy builds defaulted to the shared directory -
+        // force it here so a previously persisted "isolate game dir" setting cannot
+        // launch the wrong (mod-less) game.
+        Profiles.getSelectedProfile().getGlobal().setIsolateGameDir(false);
+
         getMjyPackageList()
                 .thenCompose(unused -> getMjyModList(getPackageLocation()))
                 .whenComplete((r, e) -> Schedulers.androidUIThread().execute(() -> {
                     if (e == null && isModpackInfoReady()) {
-                        String selectedVersion = Profiles.getSelectedProfile().getSelectedVersion();
-                        if (selectedVersion == null) {
-                            // Game not installed yet: install the game (+Forge) first, then the modpack.
+                        if (!isGameReady(mjyModPackageList.gameVersion)) {
+                            // No proper Forge install of the modpack is currently selected
+                            // (e.g. a stale vanilla version left over from an interrupted
+                            // setup): install the game body (+Forge) first, then the modpack.
                             installGameThenModpack(context, launchAction);
                         } else if (!isCanUpdateMjyGame()) {
                             // Already up to date: launch immediately.
@@ -350,6 +427,12 @@ public class ModpackManager {
 
     private void installGame(Context context, String name, String gameVersion, RemoteVersion forge, Runnable launchAction) {
         try {
+            // Remove any stale version with the same name (e.g. a leftover vanilla or a
+            // half-installed build) so the fresh Forge install cannot collide with it.
+            if (Profiles.getSelectedProfile().getRepository().hasVersion(name)) {
+                Profiles.getSelectedProfile().getRepository().removeVersionFromDisk(name);
+            }
+
             GameBuilder builder = Profiles.getSelectedProfile().getDependency().gameBuilder();
             builder.name(name);
             builder.gameVersion(gameVersion);

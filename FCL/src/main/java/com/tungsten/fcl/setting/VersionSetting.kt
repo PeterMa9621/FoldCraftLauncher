@@ -170,9 +170,12 @@ class VersionSetting : Cloneable {
     /**
      * 0 - .minecraft<br></br>
      * 1 - .minecraft/versions/&lt;version&gt;/<br></br>
+     *
+     * Default to the shared .minecraft directory (false), matching the legacy behaviour:
+     * the modpack is downloaded into the shared directory, so the game must run there.
      */
     val isolateGameDirProperty: BooleanProperty =
-        SimpleBooleanProperty(this, "isolateGameDir", true)
+        SimpleBooleanProperty(this, "isolateGameDir", false)
     var isIsolateGameDir: Boolean
         get() = isolateGameDirProperty.get()
         set(isolate) {
