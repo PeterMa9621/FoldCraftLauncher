@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name" translatable="false">Fold Craft Launcher</string>
+    <string name="app_name" translatable="false">X 计划</string>
     <string name="app_name_import">Cài đặt Modpack</string>
 
     <string name="splash_agreement">FCL yêu cầu quyền lưu trữ để quản lý và đọc các tệp trò chơi. FCL hoàn toàn mã nguồn mở trên GitHub, vì vậy bạn hãy yên tâm về an toàn dữ liệu của mình. Quyền này chỉ nhằm mục đích để trò chơi hoạt động bình thường và không gây ra rủi ro về bảo mật.</string>
-    <string name="splash_permission_msg">Không có quyền lưu trữ, vui lòng cấp quyền cho Fold Craft Launcher.</string>
+    <string name="splash_permission_msg">Không có quyền lưu trữ, vui lòng cấp quyền cho X 计划.</string>
     <string name="splash_permission_grant">Cấp quyền</string>
     <string name="splash_permission_title">Cần quyền lưu trữ</string>
     <string name="splash_permission_close">Đóng ứng dụng</string>
@@ -11,7 +11,7 @@
     <string name="splash_permission_settings_msg">Bạn đã chọn "Không bao giờ cho phép". Vui lòng cấp quyền lưu trữ theo cách thủ công trong cài đặt.</string>
     <string name="notification_permission">FCL yêu cầu quyền gửi thông báo để tránh các sự cố khi cài đặt hoặc khởi động trò chơi.</string>
 
-    <string name="splash_title">Chào mừng đến với Fold Craft Launcher</string>
+    <string name="splash_title">Chào mừng đến với X 计划</string>
     <string name="splash_eula_error">Không thể lấy EULA, vui lòng kiểm tra kết nối mạng.</string>
     <string name="splash_eula_next">Đồng ý và Tiếp tục</string>
     <string name="splash_runtime_title">Cài đặt hoặc cập nhật thời gian chạy ứng dụng</string>
@@ -37,11 +37,11 @@
     <string name="setting">Cài đặt</string>
     
     <string name="about">Giới thiệu</string>
-    <string name="about_launcher" translatable="false">Fold Craft Launcher</string>
+    <string name="about_launcher" translatable="false">X 计划</string>
     <string name="about_developer" translatable="false">FCL-Team</string>
     <string name="about_sponsor">Nhà tài trợ</string>
     <string name="about_source">Mã nguồn mở</string>
-    <string name="about_desc">Fold Craft Launcher là trình khởi chạy Minecraft dành cho Android, cho phép người dùng chạy Minecraft: Java Edition trên thiết bị Android.\n\nFold Craft Launcher được phát triển bởi FCL-Team.\n\nHầu hết các tính năng của Fold Craft Launcher được sửa đổi dựa trên HMCLCore.\n\nỨng dụng này sử dụng và trích dẫn một số mã của PojavLauncher và Boat, vì vậy nếu bạn định phân phối ứng dụng này, vui lòng tuân theo Giấy phép GPL-v3.</string>
+    <string name="about_desc">X 计划 là trình khởi chạy Minecraft dành cho Android, cho phép người dùng chạy Minecraft: Java Edition trên thiết bị Android.\n\nX 计划 được phát triển bởi FCL-Team.\n\nHầu hết các tính năng của X 计划 được sửa đổi dựa trên HMCLCore.\n\nỨng dụng này sử dụng và trích dẫn một số mã của PojavLauncher và Boat, vì vậy nếu bạn định phân phối ứng dụng này, vui lòng tuân theo Giấy phép GPL-v3.</string>
 
     <string name="account_add_server">Thêm máy chủ xác thực</string>
     <string name="account_add_server_url">URL máy chủ</string>

@@ -21,7 +21,7 @@
     <string name="file_browser_share_message">Sind Sie sicher, dass Sie diese Datei teilen möchten?</string>
 
     <string name="crash_reporter_title">Absturzbericht</string>
-    <string name="crash_reporter_hint">Fold Craft Launcher ist auf einen unlösbaren Fehler gestoßen. Bitte wenden Sie sich an den Entwickler oder andere um Hilfe.</string>
+    <string name="crash_reporter_hint">X 计划 ist auf einen unlösbaren Fehler gestoßen. Bitte wenden Sie sich an den Entwickler oder andere um Hilfe.</string>
     <string name="crash_reporter_restart">Neustart</string>
     <string name="crash_reporter_close">Beenden</string>
     <string name="crash_reporter_copy">Kopieren</string>

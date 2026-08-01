@@ -21,7 +21,7 @@
     <string name="file_browser_share_message">Вы уверены, что хотите поделиться этим файлом?</string>
 
     <string name="crash_reporter_title">Отчет об ошибке</string>
-    <string name="crash_reporter_hint">В Fold Craft Launcher произошла критическая ошибка. Обратитесь к разработчику или в сообщество за помощью.</string>
+    <string name="crash_reporter_hint">В X 计划 произошла критическая ошибка. Обратитесь к разработчику или в сообщество за помощью.</string>
     <string name="crash_reporter_restart">Перезапустить</string>
     <string name="crash_reporter_close">Выйти</string>
     <string name="crash_reporter_copy">Копировать</string>

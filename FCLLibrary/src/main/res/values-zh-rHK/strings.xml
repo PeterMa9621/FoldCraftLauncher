@@ -20,7 +20,7 @@
     <string name="file_browser_share_message">你確定要分享此檔案嗎？</string>
 
     <string name="crash_reporter_title">崩潰報告</string>
-    <string name="crash_reporter_hint">Fold Craft Launcher 遇到無法解決嘅錯誤，請向開發者或其他人求助。</string>
+    <string name="crash_reporter_hint">X 计划 遇到無法解決嘅錯誤，請向開發者或其他人求助。</string>
     <string name="crash_reporter_restart">重新啟動軟件</string>
     <string name="crash_reporter_close">退出軟件</string>
     <string name="crash_reporter_copy">複製日誌</string>
