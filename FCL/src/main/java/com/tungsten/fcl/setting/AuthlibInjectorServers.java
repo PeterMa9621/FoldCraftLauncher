@@ -44,6 +44,12 @@ public final class AuthlibInjectorServers implements Validation {
 
     public static final String CONFIG_FILENAME = "authlib-injectors.json";
 
+    /**
+     * 默认认证服务器，未配置任何认证服务器时自动添加。
+     * 注意：URL 必须以 "/" 结尾（AuthlibInjectorProvider 直接拼接子路径）。
+     */
+    public static final String DEFAULT_SERVER_URL = "https://littleskin.cn/api/yggdrasil/";
+
     private static final Set<AuthlibInjectorServer> servers = new CopyOnWriteArraySet<>();
 
     public static Set<AuthlibInjectorServer> getServers() {
@@ -67,16 +73,15 @@ public final class AuthlibInjectorServers implements Validation {
 
     public static void init() {
         if (ConfigHolder.isNewlyCreated() && Files.exists(configLocation)) {
-            AuthlibInjectorServers configInstance;
+            AuthlibInjectorServers configInstance = null;
             try {
                 String content = FileUtils.readText(configLocation);
                 configInstance = JsonUtils.GSON.fromJson(content, AuthlibInjectorServers.class);
             } catch (IOException | JsonParseException e) {
                 LOG.log(Level.WARNING, "Malformed authlib-injectors.json", e);
-                return;
             }
 
-            if (!configInstance.urls.isEmpty()) {
+            if (configInstance != null && !configInstance.urls.isEmpty()) {
                 config().setPreferredLoginType(Accounts.getLoginType(Accounts.FACTORY_AUTHLIB_INJECTOR));
                 for (String url : configInstance.urls) {
                     Task.supplyAsync(Schedulers.io(), () -> AuthlibInjectorServer.locateServer(url))
@@ -88,5 +93,29 @@ public final class AuthlibInjectorServers implements Validation {
                 }
             }
         }
+        ensureDefaultServer();
+    }
+
+    /**
+     * 若当前没有配置任何认证服务器，自动添加默认认证服务器（LittleSkin）。
+     * 优先联网解析服务器元数据（名称等），失败时直接以 URL 添加，
+     * 元数据会在后续启动时由 {@link Accounts#init()} 自动补全。
+     */
+    private static void ensureDefaultServer() {
+        if (!config().getAuthlibInjectorServers().isEmpty()) {
+            return;
+        }
+        Task.supplyAsync(Schedulers.io(), () -> {
+            try {
+                return AuthlibInjectorServer.locateServer(DEFAULT_SERVER_URL);
+            } catch (IOException e) {
+                LOG.log(Level.WARNING, "Failed to resolve default auth server, adding it without metadata: " + DEFAULT_SERVER_URL, e);
+                return new AuthlibInjectorServer(DEFAULT_SERVER_URL);
+            }
+        }).thenAcceptAsync(Schedulers.androidUIThread(), server -> {
+            if (!config().getAuthlibInjectorServers().contains(server)) {
+                config().getAuthlibInjectorServers().add(server);
+            }
+        }).start();
     }
 }

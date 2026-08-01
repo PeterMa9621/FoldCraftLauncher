@@ -108,7 +108,8 @@
             android:focusable="true"
             android:orientation="horizontal"
             android:padding="10dp"
-            android:stateListAnimator="@xml/anim_scale">
+            android:stateListAnimator="@xml/anim_scale"
+            android:visibility="gone">
 
             <com.tungsten.fcllibrary.component.view.FCLImageView
                 android:layout_width="20dp"
