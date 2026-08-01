@@ -176,7 +176,7 @@
             android:focusable="true"
             android:padding="5dp"
             android:stateListAnimator="@xml/anim_scale"
-            app:layout_constraintBottom_toTopOf="@id/version"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
@@ -186,7 +186,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/launch"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@id/version_name"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -196,6 +196,7 @@
                 android:id="@+id/icon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -210,6 +211,7 @@
                 android:gravity="center"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:singleLine="true"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/icon"
@@ -239,42 +241,6 @@
                 app:use_theme_color="true" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/version"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginBottom="8dp"
-            android:stateListAnimator="@xml/anim_scale"
-            android:text="@string/manage_version"
-            android:textAllCaps="false"
-            app:autoSizeMaxTextSize="14sp"
-            app:autoSizeMinTextSize="8sp"
-            app:autoSizeTextType="uniform"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/jar"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/jar"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:stateListAnimator="@xml/anim_scale"
-            android:text="@string/jar_execute"
-            android:textAllCaps="false"
-            app:autoSizeMaxTextSize="14sp"
-            app:autoSizeMinTextSize="8sp"
-            app:autoSizeTextType="uniform"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintStart_toEndOf="@id/version" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

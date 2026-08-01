@@ -910,7 +910,7 @@
     <string name="select_renderer">Renderer auswählen</string>
     <string name="open_link_failed">Automatischer Browserstart fehlgeschlagen. Link wurde automatisch kopiert. Bitte öffnen Sie den Browser manuell und fügen Sie ihn ein.</string>
 
-    <string name="launch">Starten</string>
+    <string name="launch">Spiel starten</string>
     <string name="tip_hide_menu_view">Menü ist ausgeblendet. Drücken Sie die Lautstärketaste, um das Menü zu öffnen.</string>
     <string name="modloader">Mod-Loader</string>
     <string name="message_warn_renderer_global_setting">Die von Ihnen gewählte Version hat separate Einstellungen für jedes Profil, daher kann der hier angegebene Renderer nicht auf die aktuelle Version angewendet werden. Es wird empfohlen, die "Starten"-Taste lange zu drücken, um den Renderer auszuwählen.</string>

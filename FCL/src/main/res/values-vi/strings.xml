@@ -1234,7 +1234,7 @@
     <string name="select_renderer">Chọn Trình kết xuất</string>
     <string name="open_link_failed">Không thể tự động chuyển hướng đến trình duyệt. Liên kết đã được tự động sao chép. Vui lòng mở trình duyệt theo cách thủ công và dán vào.</string>
 
-    <string name="launch">Khởi chạy</string>
+    <string name="launch">Khởi chạy trò chơi</string>
     <string name="tip_hide_menu_view">Chế độ xem menu đã bị ẩn. Nhấn phím âm lượng để mở menu.</string>
     <string name="modloader">Trình tải Mod</string>
     <string name="message_warn_renderer_global_setting">Phiên bản bạn đã chọn hiện tại đã bật cài đặt theo instance, vì vậy trình kết xuất được chọn ở đây không thể áp dụng cho phiên bản hiện tại. Đề xuất nhấn giữ nút "Khởi chạy" để chọn trình kết xuất.</string>

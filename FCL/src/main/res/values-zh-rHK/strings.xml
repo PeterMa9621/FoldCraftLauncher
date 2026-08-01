@@ -1033,7 +1033,7 @@
     <string name="manage_version">管理版本</string>
     <string name="select_renderer">選擇渲染器</string>
     <string name="open_link_failed">未能自動跳轉至瀏覽器，已自動複製鏈接，請手動打開瀏覽器粘貼進入。</string>
-    <string name="launch">啟動</string>
+    <string name="launch">啟動遊戲</string>
     <string name="tip_hide_menu_view">菜單按鍵已隱藏，按下音量鍵打開菜單。</string>
     <string name="modloader">模組加載器</string>
     <string name="message_warn_renderer_global_setting">你當前選擇嘅版本已啟用遊戲特定設置，所以喺此處修改嘅渲染器無法應用於當前版本。建議長按「啟動」按鈕選擇渲染器。</string>

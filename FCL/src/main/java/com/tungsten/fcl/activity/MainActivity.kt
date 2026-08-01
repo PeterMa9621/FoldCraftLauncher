@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.media.MediaPlayer
@@ -38,10 +37,8 @@ import com.mio.util.DisplayUtil
 import com.mio.util.GuideUtil
 import com.mio.util.GuideUtil.Companion.guideTarget
 import com.mio.util.ImageUtil
-import com.mio.util.showWarningDialog
 import com.tungsten.fcl.R
 import com.tungsten.fcl.databinding.ActivityMainBinding
-import com.tungsten.fcl.game.JarExecutorHelper
 import com.tungsten.fcl.game.TexturesLoader
 import com.tungsten.fcl.setting.Accounts
 import com.tungsten.fcl.setting.ConfigHolder
@@ -76,7 +73,6 @@ import com.tungsten.fclcore.mod.RemoteModRepository
 import com.tungsten.fclcore.util.Logging.LOG
 import com.tungsten.fclcore.util.fakefx.BindingMapping
 import com.tungsten.fcllibrary.component.FCLActivity
-import com.tungsten.fcllibrary.component.dialog.EditDialog
 import com.tungsten.fcllibrary.component.dialog.FCLAlertDialog
 import com.tungsten.fcllibrary.component.theme.ThemeEngine
 import com.tungsten.fcllibrary.component.view.FCLMenuView
@@ -183,29 +179,11 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
                 }
 
                 account.setOnClickListener(this@MainActivity)
-                version.setOnClickListener(this@MainActivity)
                 goSetting.setOnClickListener(this@MainActivity)
                 start.setOnClickListener(this@MainActivity)
                 start.setOnLongClickListener { view ->
                     RendererSelectDialog(this@MainActivity, false) {
                         onClick(view)
-                    }.show()
-                    true
-                }
-                jar.setOnClickListener(this@MainActivity)
-                jar.setOnLongClickListener {
-                    EditDialog(this@MainActivity) {
-                        JarExecutorHelper.exec(
-                            this@MainActivity,
-                            null,
-                            JarExecutorHelper.getJava(null),
-                            it
-                        )
-                    }.apply {
-                        setTitle(R.string.jar_execute_custom_args)
-                        binding.editText.hint = "-jar xxx"
-                        binding.editText.setLines(1)
-                        binding.editText.maxLines = 1
                     }.show()
                     true
                 }
@@ -386,25 +364,8 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
                 title.setTextWithAnim(getString(R.string.account))
                 uiManager.switchUI(uiManager.accountUI)
             }
-            if (view === version && uiManager.currentUI !== uiManager.versionUI) {
-                refreshMenuView(null)
-                title.setTextWithAnim(getString(R.string.version))
-                uiManager.switchUI(uiManager.versionUI)
-            }
             if (view === back) {
                 uiManager.onBackPressed()
-            }
-            if (view === jar) {
-                if (sharedPreferences.getBoolean("showJarExecutorWarnDialog", true)) {
-                    showWarningDialog(this@MainActivity, getString(R.string.jar_executor_warn)){
-                        sharedPreferences.edit {
-                            putBoolean("showJarExecutorWarnDialog", false)
-                        }
-                    }
-                    return
-                }
-                jar.isSelected = false
-                JarExecutorHelper.start(this@MainActivity)
             }
             if (view === start) {
                 if (!Controllers.isInitialized()) {
@@ -582,19 +543,7 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
     private fun updateColor() {
         binding.apply {
             start.background = createBackground()
-            createBackground().apply {
-                version.background = this
-                jar.background = this
-            }
-            version.backgroundTintList =
-                ColorStateList.valueOf(ThemeEngine.getInstance().theme.color2).apply {
-                    version.backgroundTintList = this
-                    jar.backgroundTintList = this
-                }
-            version.setTextColor(ThemeEngine.getInstance().theme.color2)
-            jar.setTextColor(ThemeEngine.getInstance().theme.color2)
         }
-
     }
 
     private fun initBackground() {
@@ -677,7 +626,7 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
                 it.interpolator(BounceInterpolator()).start()
             }
             AnimUtil.playTranslationY(
-                listOf(start, version, jar),
+                listOf(start),
                 speed * 100L,
                 -200f,
                 0f
