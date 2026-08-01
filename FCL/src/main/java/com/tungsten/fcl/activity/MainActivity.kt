@@ -47,6 +47,7 @@ import com.tungsten.fcl.setting.Profile
 import com.tungsten.fcl.setting.Profiles
 import com.tungsten.fcl.ui.PageManager
 import com.tungsten.fcl.ui.UIManager
+import com.tungsten.fcl.ui.download.ModpackManager
 import com.tungsten.fcl.ui.download.modpack.LocalModpackPage
 import com.tungsten.fcl.ui.version.Versions
 import com.tungsten.fcl.upgrade.UpdateChecker
@@ -386,14 +387,17 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
                     return
                 }
                 val selectedProfile = Profiles.getSelectedProfile()
-                DriverPlugin.selected = runCatching {
-                    DriverPlugin.driverList.find {
-                        it.driver == selectedProfile.getVersionSetting(selectedProfile.selectedVersion).driver
-                    }
-                }.getOrNull() ?: DriverPlugin.driverList[0]
-                refreshScreenSize()
-                DisplayUtil.refreshDisplayMetrics(this@MainActivity)
-                Versions.launch(this@MainActivity, selectedProfile)
+                // 启动前自动下载或更新 modpack（模组包），下载/更新完成后立刻启动游戏
+                ModpackManager.getInstance().checkUpdateAndLaunch(this@MainActivity) {
+                    DriverPlugin.selected = runCatching {
+                        DriverPlugin.driverList.find {
+                            it.driver == selectedProfile.getVersionSetting(selectedProfile.selectedVersion).driver
+                        }
+                    }.getOrNull() ?: DriverPlugin.driverList[0]
+                    refreshScreenSize()
+                    DisplayUtil.refreshDisplayMetrics(this@MainActivity)
+                    Versions.launch(this@MainActivity, selectedProfile)
+                }
             }
             if (view === goSetting) {
                 val profile = Profiles.getSelectedProfile()

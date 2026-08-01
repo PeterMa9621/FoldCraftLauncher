@@ -71,6 +71,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -191,10 +192,16 @@ public class ForgeNewInstallTask extends Task<Version> {
         Activity context = FCLApplication.getCurrentActivity();
         int exitCode;
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        boolean listen = true;
-        while (listen) {
-            if (activityManager.getRunningAppProcesses().size() == 1) {
-                listen = false;
+        int waitAttempts = 0;
+        while (activityManager.getRunningAppProcesses().size() != 1) {
+            if (++waitAttempts > 1000) {
+                LOG.warning("Gave up waiting for other app processes to exit, continuing with forge processor anyway");
+                break;
+            }
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException ignore) {
+                Thread.currentThread().interrupt();
             }
         }
         CountDownLatch latch = new CountDownLatch(1);
@@ -225,14 +232,24 @@ public class ForgeNewInstallTask extends Task<Version> {
             break;
         }
         server.start();
-        latch.await();
+        boolean completed = latch.await(10, TimeUnit.MINUTES);
+        if (!completed) {
+            try {
+                server.stop();
+            } catch (Throwable ignore) {
+            }
+            activityManager.getRunningAppProcesses().forEach(info -> {
+                if (info.pid != Process.myPid()) {
+                    Process.killProcess(info.pid);
+                }
+            });
+            throw new IOException("Forge processor timed out: the JVM process did not report back (java " + java + "). Check /PX/log/latest_api_installer.log for details.");
+        }
         exitCode = Integer.parseInt((String) server.getResult());
         if (exitCode != 0) {
             if (java == 8) {
                 runJVMProcess(processor, command, 17);
             } else if (java == 17) {
-                runJVMProcess(processor, command, 11);
-            } else if (java == 11) {
                 runJVMProcess(processor, command, 21);
             } else {
                 throw new IOException("Game processor exited abnormally with code " + exitCode);

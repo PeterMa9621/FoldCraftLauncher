@@ -532,8 +532,14 @@ public class FCLauncher {
 
                 // launch api installer
                 launch(config, bridge, "API Installer");
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
+                try {
+                    log(bridge, "API Installer failed with exception: " + e);
+                } catch (Throwable ignore) {
+                }
+                // Report a non-zero exit code so the waiting installer task does not block forever.
+                bridge.onExit(-1);
             }
         });
 
