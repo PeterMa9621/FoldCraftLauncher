@@ -431,7 +431,7 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
                         accountHint.text = getString(R.string.account_state_add)
                         avatar.setBackgroundDrawable(
                             TexturesLoader.toAvatar(
-                                TexturesLoader.getDefaultSkin(TextureModel.ALEX).image,
+                                TexturesLoader.getDefaultSkin(TextureModel.ALEX).image(),
                                 ConvertUtils.dip2px(
                                     this@MainActivity, 52f
                                 )
@@ -789,7 +789,7 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
     }
 
     private fun refreshScreenSize() {
-        DisplayUtil.screenWidth =  binding.root.width
+        DisplayUtil.screenWidth = binding.root.width
         DisplayUtil.screenHeight = binding.root.height
     }
 }

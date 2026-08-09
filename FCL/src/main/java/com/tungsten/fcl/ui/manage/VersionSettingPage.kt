@@ -2,11 +2,9 @@ package com.tungsten.fcl.ui.manage
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
-import android.content.DialogInterface
 import android.view.View
 import android.view.View.OnLongClickListener
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.core.net.toUri
 import com.mio.manager.RendererManager.getRenderer
@@ -16,7 +14,6 @@ import com.mio.ui.dialog.RendererSelectDialog
 import com.mio.util.showErrorDialog
 import com.mio.util.showItemSelectionDialog
 import com.tungsten.fcl.R
-import com.tungsten.fcl.activity.MainActivity
 import com.tungsten.fcl.activity.MainActivity.Companion.getInstance
 import com.tungsten.fcl.control.SelectControllerDialog
 import com.tungsten.fcl.databinding.PageVersionSettingBinding
@@ -205,8 +202,11 @@ class VersionSettingPage(
         }
         val listener = OnLongClickListener { view: View? ->
             val dialog = FullEditDialog(
-                context
-            ) { str: String? -> (view as FCLEditText).setText(str) }
+                context,
+                true
+            ) {
+                (view as FCLEditText).setText(it)
+            }
             dialog.getEditText().setText((view as FCLEditText).getText())
             dialog.show()
             true
@@ -317,10 +317,6 @@ class VersionSettingPage(
                 lastVersionSetting.forceResolutionProperty
             )
             FXUtils.unbindBoolean(
-                binding.switchControllerInjector,
-                lastVersionSetting.beGestureProperty
-            )
-            FXUtils.unbindBoolean(
                 binding.switchVulkanDriverSystem,
                 lastVersionSetting.vkDriverSystemProperty
             )
@@ -345,7 +341,6 @@ class VersionSettingPage(
         FXUtils.bindBoolean(binding.switchNotCheckMod, versionSetting.notCheckModProperty)
         FXUtils.bindBoolean(binding.switchDebugLog, versionSetting.debugLogProperty)
         FXUtils.bindBoolean(binding.switchForceResolution, versionSetting.forceResolutionProperty)
-        FXUtils.bindBoolean(binding.switchControllerInjector, versionSetting.beGestureProperty)
         FXUtils.bindBoolean(binding.switchVulkanDriverSystem, versionSetting.vkDriverSystemProperty)
         maxMemory.bindBidirectional(versionSetting.maxMemoryProperty)
 
@@ -360,7 +355,6 @@ class VersionSettingPage(
         }
         binding.graphicsBackend.text = versionSetting.graphicsBackend
         val renderer = getRenderer(versionSetting.renderer)
-        binding.renderer.setSelected(true)
         binding.renderer.text = renderer.des
         binding.driverContainer.visibility =
             if (binding.switchVulkanDriverSystem.checkProperty().get()) View.GONE else View.VISIBLE
@@ -390,8 +384,8 @@ class VersionSettingPage(
     private fun onExploreIcon() {
         if (versionId == null) return
 
-        MainActivity.getInstance().fileLauncher.launchSingleSelection(null, listOf(".png")) {
-            var path = it[0]
+        getInstance().fileLauncher.launchSingleSelection(null, listOf(".png")) {
+            var path = it?.get(0) ?: return@launchSingleSelection
             val uri = path.toUri()
             if (AndroidUtils.isDocUri(uri)) {
                 path =

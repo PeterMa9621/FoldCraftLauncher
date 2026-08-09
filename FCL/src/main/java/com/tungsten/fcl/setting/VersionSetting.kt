@@ -182,13 +182,6 @@ class VersionSetting : Cloneable {
             isolateGameDirProperty.set(isolate)
         }
 
-    val beGestureProperty: BooleanProperty = SimpleBooleanProperty(this, "beGesture", true)
-    var isBeGesture: Boolean
-        get() = beGestureProperty.get()
-        set(beGesture) {
-            beGestureProperty.set(beGesture)
-        }
-
     val graphicsBackendProperty: StringProperty = SimpleStringProperty(this, "graphicsBackend", "default")
     var graphicsBackend: String
         get() = graphicsBackendProperty.get()
@@ -282,7 +275,6 @@ class VersionSetting : Cloneable {
         notCheckJVMProperty.addListener(listener)
         serverIpProperty.addListener(listener)
         isolateGameDirProperty.addListener(listener)
-        beGestureProperty.addListener(listener)
         graphicsBackendProperty.addListener(listener)
         vkDriverSystemProperty.addListener(listener)
         controllerProperty.addListener(listener)
@@ -308,7 +300,6 @@ class VersionSetting : Cloneable {
             it.isNotCheckJVM = isNotCheckJVM
             it.serverIp = serverIp
             it.isIsolateGameDir = isIsolateGameDir
-            it.isBeGesture = isBeGesture
             it.graphicsBackend = graphicsBackend
             it.isVKDriverSystem = isVKDriverSystem
             it.controller = controller
@@ -343,7 +334,6 @@ class VersionSetting : Cloneable {
                 addProperty("java", src.java)
                 addProperty("notCheckGame", src.isNotCheckGame)
                 addProperty("notCheckJVM", src.isNotCheckJVM)
-                addProperty("beGesture", src.isBeGesture)
                 addProperty("graphicsBackend", src.graphicsBackend)
                 addProperty("vulkanDriverSystem", src.isVKDriverSystem)
                 addProperty("controller", src.controller)
@@ -384,7 +374,6 @@ class VersionSetting : Cloneable {
                         ?: "Auto"
                 vs.isNotCheckGame = json["notCheckGame"]?.asBoolean ?: false
                 vs.isNotCheckJVM = json["notCheckJVM"]?.asBoolean ?: false
-                vs.isBeGesture = json["beGesture"]?.asBoolean ?: false
                 vs.graphicsBackend = json["graphicsBackend"]?.asString ?: "default"
                 vs.isVKDriverSystem = json["vulkanDriverSystem"]?.asBoolean ?: false
                 vs.controller = json["controller"]?.asString ?: ("00000000")

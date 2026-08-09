@@ -6,8 +6,6 @@ import static com.tungsten.fclcore.util.Lang.thread;
 import static com.tungsten.fclcore.util.Logging.LOG;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,16 +35,12 @@ import com.tungsten.fcl.setting.DownloadProviders;
 import com.tungsten.fcl.upgrade.UpdateChecker;
 import com.tungsten.fcl.util.AndroidUtils;
 import com.tungsten.fcl.util.FXUtils;
-import com.tungsten.fcl.util.RequestCodes;
 import com.tungsten.fclauncher.utils.FCLPath;
 import com.tungsten.fclcore.task.FetchTask;
 import com.tungsten.fclcore.task.Schedulers;
 import com.tungsten.fclcore.task.Task;
 import com.tungsten.fclcore.util.Logging;
 import com.tungsten.fclcore.util.io.FileUtils;
-import com.tungsten.fcllibrary.browser.FileBrowser;
-import com.tungsten.fcllibrary.browser.options.LibMode;
-import com.tungsten.fcllibrary.browser.options.SelectionMode;
 import com.tungsten.fcllibrary.component.dialog.FCLAlertDialog;
 import com.tungsten.fcllibrary.component.dialog.FCLColorPickerDialog;
 import com.tungsten.fcllibrary.component.theme.Theme;
@@ -67,7 +61,6 @@ import java.util.logging.Level;
 
 public class LauncherSettingPage extends FCLCommonPage implements View.OnClickListener, AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener {
 
-    public static final long ONE_DAY = 1000 * 60 * 60 * 24;
     private PageSettingLauncherBinding binding;
     private boolean isFirst = true;
     private SharedPreferences sharedPreferences;
@@ -207,23 +200,6 @@ public class LauncherSettingPage extends FCLCommonPage implements View.OnClickLi
         binding.threads.setProgress(config().getDownloadThreads());
         binding.threads.addProgressListener();
         binding.threads.progressProperty().bindBidirectional(config().downloadThreadsProperty());
-
-        if (System.currentTimeMillis() - getLastClearCacheTime() >= 3 * ONE_DAY) {
-            FileUtils.cleanDirectoryQuietly(new File(FCLPath.CACHE_DIR).getParentFile());
-            setLastClearCacheTime(System.currentTimeMillis());
-        }
-    }
-
-    public long getLastClearCacheTime() {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("launcher", MODE_PRIVATE);
-        return sharedPreferences.getLong("clear_cache", 0L);
-    }
-
-    public void setLastClearCacheTime(long time) {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("launcher", MODE_PRIVATE);
-        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putLong("clear_cache", time);
-        editor.apply();
     }
 
     private int getSourcePosition(String source) {
@@ -363,6 +339,7 @@ public class LauncherSettingPage extends FCLCommonPage implements View.OnClickLi
             suffix.add(".jpg");
             suffix.add(".jpeg");
             MainActivity.getInstance().fileLauncher.launchSingleSelection(null, suffix, files -> {
+                if (files == null) return;
                 String path = files.get(0);
                 Uri uri = Uri.parse(path);
                 if (AndroidUtils.isDocUri(uri)) {
@@ -375,6 +352,7 @@ public class LauncherSettingPage extends FCLCommonPage implements View.OnClickLi
             ArrayList<String> suffix = new ArrayList<>();
             suffix.add(".mp4");
             MainActivity.getInstance().fileLauncher.launchSingleSelection(null, suffix, files -> {
+                if (files == null) return;
                 String path = files.get(0);
                 Uri uri = Uri.parse(path);
                 if (AndroidUtils.isDocUri(uri)) {
@@ -393,6 +371,7 @@ public class LauncherSettingPage extends FCLCommonPage implements View.OnClickLi
             suffix.add(".png");
             suffix.add(".gif");
             MainActivity.getInstance().fileLauncher.launchSingleSelection(null, suffix, files -> {
+                if (files == null) return;
                 String path = files.get(0);
                 Uri uri = Uri.parse(path);
                 String type = AndroidUtils.getFileName(getContext(), uri);
@@ -417,6 +396,7 @@ public class LauncherSettingPage extends FCLCommonPage implements View.OnClickLi
             suffix.add(".png");
             suffix.add(".gif");
             MainActivity.getInstance().fileLauncher.launchSingleSelection(null, suffix, files -> {
+                if (files == null) return;
                 String path = files.get(0);
                 Uri uri = Uri.parse(path);
                 String type = AndroidUtils.getFileName(getContext(), uri);
