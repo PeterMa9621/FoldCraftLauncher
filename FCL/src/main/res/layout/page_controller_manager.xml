@@ -5,10 +5,16 @@
     android:layout_height="match_parent"
     android:padding="10dp">
 
+    <!-- 布局列表这一列原本完全透明，压在深色背景图上时标题和「导入/创建/下载布局」三个按钮
+         （bg_container_transparent_clickable + 黑色 theme color2 文字）整块看不见，
+         这里和「创建账户」侧栏一样铺一层浅色面板底。 -->
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:background="@drawable/bg_side_panel"
         android:orientation="vertical"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"

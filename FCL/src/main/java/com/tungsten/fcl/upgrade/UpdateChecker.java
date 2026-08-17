@@ -19,6 +19,13 @@ import java.util.ArrayList;
 
 public class UpdateChecker {
 
+    /**
+     * X 计划定制版禁用启动器自更新：上游 version_map.json 指向的是官方 FCL 的 APK，
+     * 玩家一升级就离开了定制版。入口（主页自动检查、设置页"检查更新"按钮）已经删掉，
+     * 这里再兜一层，任何残留调用都直接空转，玩家没有开关可以自行打开。
+     */
+    public static final boolean UPDATE_ENABLED = false;
+
     public static final String UPDATE_CHECK_URL = "https://raw.githubusercontent.com/FCL-Team/FoldCraftLauncher/main/version_map.json";
     public static final String UPDATE_CHECK_URL_CN = "https://gitee.com/fcl-team/FCL-Repo/raw/main/res/version_map.json";
 
@@ -51,6 +58,10 @@ public class UpdateChecker {
 
     public Task<?> check(Context context, boolean showBeta, boolean showAlert) {
         return Task.runAsync(() -> {
+            if (!UPDATE_ENABLED) {
+                isChecking = false;
+                return;
+            }
             isChecking = true;
             if (showAlert) {
                 Schedulers.androidUIThread().execute(() -> Toast.makeText(context, context.getString(R.string.update_checking), Toast.LENGTH_SHORT).show());

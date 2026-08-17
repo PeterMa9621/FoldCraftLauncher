@@ -32,7 +32,6 @@ import com.tungsten.fcl.R;
 import com.tungsten.fcl.activity.MainActivity;
 import com.tungsten.fcl.databinding.PageSettingLauncherBinding;
 import com.tungsten.fcl.setting.DownloadProviders;
-import com.tungsten.fcl.upgrade.UpdateChecker;
 import com.tungsten.fcl.util.AndroidUtils;
 import com.tungsten.fcl.util.FXUtils;
 import com.tungsten.fclauncher.utils.FCLPath;
@@ -75,7 +74,6 @@ public class LauncherSettingPage extends FCLCommonPage implements View.OnClickLi
         binding = PageSettingLauncherBinding.bind(getContentView());
         sharedPreferences = getActivity().getSharedPreferences("launcher", MODE_PRIVATE);
 
-        binding.checkUpdate.setOnClickListener(this);
         binding.clearCache.setOnClickListener(this);
         binding.exportLog.setOnClickListener(this);
         binding.requestAudioRecord.setOnClickListener(this);
@@ -217,18 +215,6 @@ public class LauncherSettingPage extends FCLCommonPage implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
-        if (v == binding.checkUpdate && !UpdateChecker.getInstance().isChecking()) {
-            UpdateChecker.getInstance().checkManually(getContext()).whenComplete(Schedulers.androidUIThread(), e -> {
-                if (e != null) {
-                    FCLAlertDialog.Builder builder = new FCLAlertDialog.Builder(getContext());
-                    builder.setCancelable(false);
-                    builder.setAlertLevel(FCLAlertDialog.AlertLevel.ALERT);
-                    builder.setMessage(getContext().getString(R.string.update_check_failed) + "\n" + e);
-                    builder.setNegativeButton(getContext().getString(com.tungsten.fcllibrary.R.string.dialog_positive), null);
-                    builder.create().show();
-                }
-            }).start();
-        }
         if (v == binding.clearCache) {
             FileUtils.cleanDirectoryQuietly(new File(FCLPath.CACHE_DIR).getParentFile());
         }

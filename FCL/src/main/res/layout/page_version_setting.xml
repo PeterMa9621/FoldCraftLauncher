@@ -160,16 +160,19 @@
                         android:layout_height="1dp"
                         android:background="@android:color/darker_gray" />
 
+                    <!-- 版本隔离：定制版不给玩家改 -->
                     <com.tungsten.fcllibrary.component.view.FCLSwitch
                         android:id="@+id/switch_game_dir"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:visibility="gone"
                         android:text="@string/settings_game_working_directory" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:visibility="gone"
                         android:background="@android:color/darker_gray" />
 
                     <androidx.appcompat.widget.LinearLayoutCompat
@@ -253,13 +256,16 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:visibility="gone"
                         android:background="@android:color/darker_gray" />
 
+                    <!-- 服务器地址：定制版不给玩家改 -->
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:minHeight="48dp"
                         android:orientation="horizontal"
+                        android:visibility="gone"
                         android:paddingTop="8dp"
                         android:paddingBottom="8dp">
 
@@ -545,16 +551,19 @@
                     android:paddingEnd="12dp"
                     app:auto_linear_background_tint="true">
 
+                    <!-- 不检查游戏完整性：定制版不给玩家改 -->
                     <com.tungsten.fcllibrary.component.view.FCLSwitch
                         android:id="@+id/switch_not_check_game"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:visibility="gone"
                         android:text="@string/settings_advanced_dont_check_game_completeness" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:visibility="gone"
                         android:background="@android:color/darker_gray" />
 
                     <com.tungsten.fcllibrary.component.view.FCLSwitch
@@ -569,16 +578,19 @@
                         android:layout_height="1dp"
                         android:background="@android:color/darker_gray" />
 
+                    <!-- 不检查模组兼容性：定制版不给玩家改 -->
                     <com.tungsten.fcllibrary.component.view.FCLSwitch
                         android:id="@+id/switch_not_check_mod"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:visibility="gone"
                         android:text="@string/settings_advanced_dont_check_mod" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:visibility="gone"
                         android:background="@android:color/darker_gray" />
 
                     <com.tungsten.fcllibrary.component.view.FCLSwitch
@@ -593,11 +605,13 @@
                         android:layout_height="1dp"
                         android:background="@android:color/darker_gray" />
 
+                    <!-- 游戏参数：定制版不给玩家改 -->
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:minHeight="48dp"
                         android:orientation="horizontal"
+                        android:visibility="gone"
                         android:paddingTop="8dp"
                         android:paddingBottom="8dp">
 
@@ -626,13 +640,16 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:visibility="gone"
                         android:background="@android:color/darker_gray" />
 
+                    <!-- Java 虚拟机参数：定制版不给玩家改 -->
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:minHeight="48dp"
                         android:orientation="horizontal"
+                        android:visibility="gone"
                         android:paddingTop="8dp"
                         android:paddingBottom="8dp">
 
@@ -660,14 +677,17 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:visibility="gone"
                         android:background="@android:color/darker_gray" />
 
 
+                    <!-- 环境变量：定制版不给玩家改 -->
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:minHeight="48dp"
                         android:orientation="horizontal"
+                        android:visibility="gone"
                         android:paddingTop="8dp"
                         android:paddingBottom="8dp">
 
@@ -699,13 +719,16 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:visibility="gone"
                         android:background="@android:color/darker_gray" />
 
+                    <!-- 自定义 UUID：定制版不给玩家改 -->
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:minHeight="48dp"
                         android:orientation="horizontal"
+                        android:visibility="gone"
                         android:paddingTop="8dp"
                         android:paddingBottom="8dp">
 
@@ -733,6 +756,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:visibility="gone"
                         android:background="@android:color/darker_gray" />
 
                     <com.tungsten.fcllibrary.component.view.FCLSwitch

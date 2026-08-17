@@ -3,6 +3,7 @@ package com.tungsten.fcl.activity
 import android.Manifest.permission
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -13,6 +14,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
@@ -55,8 +57,13 @@ class SplashActivity : FCLActivity() {
     var java25: Boolean = false
     var jna: Boolean = false
 
+    // 定制版删掉了 EULA 页，连带把上游这个字段也删了；上游后来把"自动清理缓存"迁到启动页用的就是它，
+    // 所以补回来（只保留缓存清理的时间戳，不再有同意条款那套逻辑）
+    private lateinit var sharedPreferences: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sharedPreferences = getSharedPreferences("launcher", MODE_PRIVATE)
         installSplashScreen()
         setContentView(R.layout.activity_splash)
         val background = findViewById<ConstraintLayout>(R.id.background)

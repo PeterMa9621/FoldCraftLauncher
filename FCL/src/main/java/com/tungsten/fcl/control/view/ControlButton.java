@@ -23,6 +23,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.tungsten.fcl.R;
 import com.tungsten.fcl.control.EditViewDialog;
+import com.tungsten.fcl.control.FCLInput;
 import com.tungsten.fcl.control.GameMenu;
 import com.tungsten.fcl.control.GestureMode;
 import com.tungsten.fcl.control.MouseMoveMode;
@@ -259,6 +260,8 @@ public class ControlButton extends AppCompatButton implements CustomView {
 
     private float downX;
     private float downY;
+    private float followDownX;
+    private float followDownY;
     private int initialX;
     private int initialY;
     private float positionX;
@@ -352,6 +355,8 @@ public class ControlButton extends AppCompatButton implements CustomView {
                     setPressedStyle();
                     downX = event.getX();
                     downY = event.getY();
+                    followDownX = downX;
+                    followDownY = downY;
                     setInitialPosition();
                     positionX = getX();
                     positionY = getY();
@@ -514,21 +519,41 @@ public class ControlButton extends AppCompatButton implements CustomView {
         doubleClickEvent = false;
     }
 
+    /**
+     * 试着拿下全局指针控制权。拿不到只有一种情况：玩家正用另一根手指在 TouchPad 上
+     * 划屏转视角，那边优先级更高（见 {@link FCLInput#POINTER_PRIORITY_TOUCHPAD}）。
+     * <p>
+     * 这时不能只是丢掉这一帧就算了 —— deltaX/deltaY 是相对按下瞬间的
+     * followDownX/followDownY + initialX/initialY 算的，等 TouchPad 松手后这颗按钮
+     * 重新拿回控制权，会把视角一把拽回按下瞬间的角度。所以让位的同时要把基准点对齐到当前位置。
+     */
+    private boolean acquirePointer(MotionEvent event) {
+        menu.getInput().setPointerId(getData().getId());
+        if (menu.getInput().isPointerOwner(getData().getId())) {
+            return true;
+        }
+        followDownX = event.getX();
+        followDownY = event.getY();
+        setInitialPosition();
+        return false;
+    }
+
     private void handleMoveEvent(MotionEvent event) {
         if (getData().getEvent().isPointerFollow()) {
-            int deltaX = (int) ((event.getX() - downX) * menu.getMenuSetting().getMouseSensitivity());
-            int deltaY = (int) ((event.getY() - downY) * menu.getMenuSetting().getMouseSensitivity());
+            int deltaX = (int) ((event.getX() - followDownX) * menu.getMenuSetting().getMouseSensitivity());
+            int deltaY = (int) ((event.getY() - followDownY) * menu.getMenuSetting().getMouseSensitivity());
             if (menu.getCursorMode() == FCLBridge.CursorEnabled) {
-                int targetX = Math.max(0, Math.min(screenWidth, initialX + deltaX));
-                int targetY = Math.max(0, Math.min(screenHeight, initialY + deltaY));
-                menu.getInput().setPointerId(getData().getId());
-                menu.getInput().setPointer(targetX, targetY, getData().getId());
+                if (acquirePointer(event)) {
+                    int targetX = Math.max(0, Math.min(screenWidth, initialX + deltaX));
+                    int targetY = Math.max(0, Math.min(screenHeight, initialY + deltaY));
+                    menu.getInput().setPointer(targetX, targetY, getData().getId());
+                }
             } else {
                 if (menu.getMenuSetting().isEnableGyroscope()) {
+                    // 陀螺仪模式不走全局指针锁（Gyroscope 用的是 "Gyro" 这个特例 id），保持原样
                     menu.setPointerX(initialX + deltaX);
                     menu.setPointerY(initialY + deltaY);
-                } else {
-                    menu.getInput().setPointerId(getData().getId());
+                } else if (acquirePointer(event)) {
                     menu.getInput().setPointer(initialX + deltaX, initialY + deltaY, getData().getId());
                 }
             }

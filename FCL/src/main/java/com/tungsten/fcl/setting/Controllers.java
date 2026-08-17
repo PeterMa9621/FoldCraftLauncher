@@ -34,6 +34,46 @@ public class Controllers {
 
     private static final List<Runnable> CALLBACKS = new ArrayList<>();
 
+    private static final String PRESET_CONTROLLER_ASSET = "/assets/controllers/00000000.json";
+
+    private static Controller readPresetController() throws IOException {
+        String str = IOUtils.readFullyAsString(Controllers.class.getResourceAsStream(PRESET_CONTROLLER_ASSET));
+        return new GsonBuilder()
+                .registerTypeAdapterFactory(new JavaFxPropertyTypeAdapterFactory(true, true))
+                .setPrettyPrinting()
+                .create().fromJson(str, Controller.class);
+    }
+
+    /**
+     * X 计划内置按键布局：assets 里的 00000000.json 就是要预置给玩家的方案，
+     * 而 {@link VersionSetting} 的 controller 默认值也是 "00000000"，所以玩家装上就能直接用，不用自己配置。
+     * <p>
+     * 只靠 {@link #checkControllers()} 只能覆盖全新安装（它仅在一个布局都没有时才写盘）；
+     * 已经装过旧版本的玩家磁盘上留着旧的默认布局，因此这里按 versionCode 对账：
+     * 内置的比磁盘上的新就整份覆盖。以后更新预置布局，记得同时把 assets 里的 versionCode 调大。
+     */
+    private static void syncPresetController() {
+        try {
+            Controller preset = readPresetController();
+            if (preset == null) {
+                throw new JsonParseException("Preset controller is null!");
+            }
+            DEFAULT_CONTROLLER = preset;
+            Controller current = controllers.stream()
+                    .filter(it -> it != null && preset.getId().equals(it.getId()))
+                    .findFirst().orElse(null);
+            if (current == null) {
+                preset.saveToDisk();
+                controllers.add(preset);
+            } else if (current.getVersionCode() < preset.getVersionCode()) {
+                preset.saveToDisk();
+                controllers.set(controllers.indexOf(current), preset);
+            }
+        } catch (IOException | JsonParseException e) {
+            Logging.LOG.log(Level.SEVERE, "Failed to sync preset controller!", e.getMessage());
+        }
+    }
+
     public static void checkControllers() {
         if (controllers.contains(null)) {
             controllers.remove(null);
@@ -41,11 +81,7 @@ public class Controllers {
         if (controllers.isEmpty()) {
             try {
                 if (DEFAULT_CONTROLLER == null) {
-                    String str = IOUtils.readFullyAsString(Controllers.class.getResourceAsStream("/assets/controllers/00000000.json"));
-                    DEFAULT_CONTROLLER = new GsonBuilder()
-                            .registerTypeAdapterFactory(new JavaFxPropertyTypeAdapterFactory(true, true))
-                            .setPrettyPrinting()
-                            .create().fromJson(str, Controller.class);
+                    DEFAULT_CONTROLLER = readPresetController();
                 }
                 DEFAULT_CONTROLLER.saveToDisk();
             } catch (IOException e) {
@@ -94,6 +130,7 @@ public class Controllers {
             return;
 
         controllers.addAll(getControllersFromDisk());
+        syncPresetController();
         checkControllers();
 
         initialized = true;

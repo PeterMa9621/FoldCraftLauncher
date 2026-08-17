@@ -50,7 +50,6 @@ import com.tungsten.fcl.ui.UIManager
 import com.tungsten.fcl.ui.download.ModpackManager
 import com.tungsten.fcl.ui.download.modpack.LocalModpackPage
 import com.tungsten.fcl.ui.version.Versions
-import com.tungsten.fcl.upgrade.UpdateChecker
 import com.tungsten.fcl.util.AndroidUtils
 import com.tungsten.fcl.util.FXUtils
 import com.tungsten.fcl.util.WeakListenerHolder
@@ -192,14 +191,18 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
                 uiManager = UIManager(this@MainActivity, uiLayout)
                 _uiManager = uiManager
                 uiManager.registerDefaultBackEvent {
-                    if (uiManager.currentUI === uiManager.mainUI) {
+                    // 定制版隐藏了 home 菜单，账户页就是最顶层：从别的页面返回一律回账户页，
+                    // 在账户页再按返回才退出（原版这个角色是主页 mainUI）
+                    if (uiManager.currentUI === uiManager.accountUI) {
                         val i = Intent(Intent.ACTION_MAIN)
                         i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         i.addCategory(Intent.CATEGORY_HOME)
                         startActivity(i)
                         exitProcess(0)
                     } else {
-                        home.isSelected = true
+                        refreshMenuView(null)
+                        title.setTextWithAnim(getString(R.string.account))
+                        uiManager.switchUI(uiManager.accountUI)
                     }
                 }
                 uiManager.init {
@@ -221,7 +224,6 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
                         startActivity(Intent(this@MainActivity, ShellActivity::class.java))
                         true
                     }
-                    UpdateChecker.getInstance().checkAuto(this@MainActivity).start()
                     if (!checkNotificationPermission() && getSharedPreferences(
                             "launcher",
                             MODE_PRIVATE
@@ -249,8 +251,8 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
                 uiLayout.postDelayed(1500) {
                     GuideUtil.show(
                         activity = this@MainActivity,
-                        GuideUtil.TAG_GUIDE_THEME_2 to setting.guideTarget(title = getString(R.string.guide_theme2)),
-                        GuideUtil.TAG_GUIDE_SHARE_LOG to home.guideTarget(title = getString(R.string.guide_share_log))
+                        // home 菜单已隐藏，分享日志的引导不能再挂在它上面（引导会指向一个不可见的锚点）
+                        GuideUtil.TAG_GUIDE_THEME_2 to setting.guideTarget(title = getString(R.string.guide_theme2))
                     )
                 }
             }
@@ -276,6 +278,8 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
 
     override fun onPause() {
         super.onPause()
+        // 游戏 Activity 已经顶上来了（或者用户切走了），遮罩的使命结束
+        setLaunching(false)
         _uiManager?.onPause()
         if (shouldPlayVideo() && binding.videoView.isPlaying) {
             videoPosition = binding.videoView.currentPosition
@@ -283,8 +287,23 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
         }
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (!hasFocus) {
+            // 焦点被别的窗口拿走了 —— 绝大多数情况是启动流程弹出了对话框（版本检查失败、
+            // 选账户、整合包下载进度…）。此刻对话框才是 UI，玩家要能点它的取消，
+            // 遮罩必须让位；否则取消完回到账户页，会剩一个永远转不完的圈。
+            //
+            // 这一条同时兜住了 ModpackManager 之外的所有对话框（Versions.launch /
+            // LauncherHelper 里那些），那些地方没有回调可挂。
+            setLaunching(false)
+        }
+    }
+
     override fun onResume() {
         super.onResume()
+        // 从游戏退回来时兜一次底，保证按钮一定是可点的
+        setLaunching(false)
         _uiManager?.onResume()
         if (shouldPlayVideo() && !binding.videoView.isPlaying) {
             binding.videoView.seekTo(videoPosition)
@@ -352,6 +371,19 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
         }
     }
 
+    /**
+     * 启动中的加载态：整屏遮罩挡住所有点击 + 转圈，同时把"启动游戏"按钮本身也禁掉。
+     * 收起的时机有三处：走到这一步的失败回调、游戏 Activity 顶上来时的 onPause、
+     * 以及从游戏退回来的 onResume —— 任何一条路都不能把界面永久锁死。
+     */
+    private fun setLaunching(launching: Boolean) {
+        binding.apply {
+            launchingMask.visibility = if (launching) View.VISIBLE else View.GONE
+            start.isClickable = !launching
+            start.alpha = if (launching) 0.5f else 1f
+        }
+    }
+
     fun refreshMenuView(view: FCLMenuView?) {
         binding.leftMenu.forEach {
             if (it is FCLMenuView && it != view) {
@@ -387,8 +419,11 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
                     return
                 }
                 val selectedProfile = Profiles.getSelectedProfile()
+                // 点下去到游戏 Activity 起来之间有一段没有任何反馈的空窗（拉 packages.json、
+                // 比对版本、组装启动参数），先把遮罩挂上，避免玩家以为卡死了反复点
+                setLaunching(true)
                 // 启动前自动下载或更新 modpack（模组包），下载/更新完成后立刻启动游戏
-                ModpackManager.getInstance().checkUpdateAndLaunch(this@MainActivity) {
+                val started = ModpackManager.getInstance().checkUpdateAndLaunch(this@MainActivity, {
                     DriverPlugin.selected = runCatching {
                         DriverPlugin.driverList.find {
                             it.driver == selectedProfile.getVersionSetting(selectedProfile.selectedVersion).driver
@@ -397,6 +432,17 @@ class MainActivity : FCLActivity(), OnSelectListener, View.OnClickListener {
                     refreshScreenSize()
                     DisplayUtil.refreshDisplayMetrics(this@MainActivity)
                     Versions.launch(this@MainActivity, selectedProfile)
+                }, {
+                    // 失败/取消/没有可用版本：把遮罩收掉，别把界面永久锁死
+                    setLaunching(false)
+                })
+                if (!started) {
+                    // 上一轮流程还没结束、这次点击被忽略：遮罩不会有人来收，自己收掉，
+                    // 同时给一句提示，否则点下去毫无反应又变成"卡住了"
+                    setLaunching(false)
+                    title.setTextWithAnim(getString(R.string.launch_state_preparing))
+                    AnimUtil.playTranslationX(start, 700, 0f, 50f, -50f, 50f, -50f, 0f)
+                        .interpolator(OvershootInterpolator()).start()
                 }
             }
             if (view === goSetting) {

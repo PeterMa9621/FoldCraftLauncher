@@ -33,6 +33,7 @@
             android:id="@+id/home"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:src="@drawable/ic_baseline_home_24"
             app:layout_constraintBottom_toTopOf="@id/manage"
             app:layout_constraintStart_toStartOf="parent"
@@ -255,6 +256,48 @@
         android:layout_height="match_parent"
         app:layout_constraintEnd_toStartOf="@id/right_menu"
         app:layout_constraintStart_toEndOf="@+id/left_menu" />
+
+    <!-- 启动游戏的加载遮罩：点了启动之后到游戏 Activity 起来之间有一段没有任何反馈的空窗
+         （拉 packages.json、比对版本、LauncherHelper 组装启动参数），这层盖住整个界面挡住
+         所有点击，同时给一个转圈。elevation 要高过左右菜单的 100dp 才盖得住它们。 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/launching_mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#B3000000"
+        android:clickable="true"
+        android:elevation="200dp"
+        android:focusable="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.tungsten.fcllibrary.component.view.FCLProgressBar
+            android:id="@+id/launching_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.45" />
+
+        <com.tungsten.fcllibrary.component.view.FCLTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:singleLine="true"
+            android:text="@string/launch_state_preparing"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/launching_progress" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.tungsten.fcllibrary.component.view.FCLDynamicIsland
         android:id="@+id/title"

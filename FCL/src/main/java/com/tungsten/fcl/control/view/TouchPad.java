@@ -237,7 +237,9 @@ public class TouchPad extends View {
                         gameMenu.setPointerX(initialX + deltaX);
                         gameMenu.setPointerY(initialY + deltaY);
                     } else {
-                        gameMenu.getInput().setPointerId(POINTER_ID);
+                        // 用高优先级抢控制权：pointerFollow 按钮（开火 / 开镜等）被按住时
+                        // 会一直占着指针锁，不抢的话玩家按住开火键就转不了视角。
+                        gameMenu.getInput().setPointerId(POINTER_ID, FCLInput.POINTER_PRIORITY_TOUCHPAD);
                         gameMenu.getInput().setPointer(initialX + deltaX, initialY + deltaY, POINTER_ID);
                     }
                     if ((Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1) && System.currentTimeMillis() - downTime < 400) {

@@ -5,6 +5,12 @@
     <color name="white">#FFFFFFFF</color>
     <color name="ui_bg_color">#40F4F4F4</color>
     <color name="right_menu_color">#80F4F4F4</color>
+    <!-- 侧边面板底色：原来的 ui_bg_color 只有 25% 不透明度，压在游戏背景图上按钮/文字看不清，
+         这里给"创建账户"面板与右侧"启动游戏"面板一个更实、更深的浅灰底 -->
+    <color name="ui_panel_bg_color">#E6DEDEDE</color>
+    <!-- 浅色面板上的列表选中底色：面板本身已经是浅灰，再用 ui_bg_color 那种近白半透明
+         叠上去看不出选中态，这里用带主题蓝的浅底 -->
+    <color name="ui_panel_selected_color">#597797CF</color>
     <color name="icon_background_color">#FFFFFF</color>
     <color name="primary_text">#0E0E0E</color>
 </resources>

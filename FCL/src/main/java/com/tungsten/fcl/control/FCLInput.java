@@ -59,18 +59,41 @@ public class FCLInput implements View.OnCapturedPointerListener {
         return menu;
     }
 
+    /**
+     * 指针控制权优先级，数字越大越优先，高优先级可以从低优先级手上抢过来。
+     * <p>
+     * 只有一个持有者能驱动游戏里的准心，所以必须仲裁；但先到先得会出问题：
+     * pointerFollow 按钮（开火 / 开镜之类）被按住时每一帧都会因手指抖动收到
+     * ACTION_MOVE 并抢下控制权，导致另一根手指在空白处怎么划都被丢掉。
+     * 让 TouchPad 的划屏转视角压过按钮，就能一边按住开火键一边转视角。
+     */
+    public static final int POINTER_PRIORITY_DEFAULT = 0;
+    public static final int POINTER_PRIORITY_TOUCHPAD = 10;
+
     private String pointerId;
+    private int pointerPriority = POINTER_PRIORITY_DEFAULT;
 
     public void setPointerId(String pointerId) {
+        setPointerId(pointerId, POINTER_PRIORITY_DEFAULT);
+    }
+
+    public void setPointerId(String pointerId, int priority) {
         if (pointerId == null) {
             this.pointerId = null;
-        } else if (this.pointerId == null) {
+            this.pointerPriority = POINTER_PRIORITY_DEFAULT;
+        } else if (this.pointerId == null || pointerId.equals(this.pointerId) || priority > this.pointerPriority) {
             this.pointerId = pointerId;
+            this.pointerPriority = priority;
         }
     }
 
     public String getPointerId() {
         return pointerId;
+    }
+
+    /** 当前是不是由 id 持有指针控制权。抢占失败的一方要靠它知道自己该让位。 */
+    public boolean isPointerOwner(String id) {
+        return id != null && id.equals(pointerId);
     }
 
     public FCLInput(@NonNull GameMenu menu) {

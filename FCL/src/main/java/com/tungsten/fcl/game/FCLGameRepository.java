@@ -33,6 +33,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import com.mio.manager.RendererManager;
 import com.mio.util.LauncherUtilKt;
+import com.tungsten.fcl.BuildConfig;
 import com.tungsten.fcl.FCLApplication;
 import com.tungsten.fcl.R;
 import com.tungsten.fcl.setting.Profile;
@@ -359,6 +360,13 @@ public class FCLGameRepository extends DefaultGameRepository {
         if (targetServer != null && !targetServer.trim().isEmpty()) {
             javaArguments.add("-DtargetServer=" + targetServer);
         }
+        // 测试服包（fortest buildType）额外告诉游戏这是测试模式
+        if (BuildConfig.TEST_MODE) {
+            javaArguments.add("-DtestMode=true");
+        }
+        // 告诉游戏里的模组这是手机端，服务端据此统计手机端占比。
+        // 模组侧还有一层安卓文件系统检测兜底（老版本启动器不传这个），这里只是把判定坐实。
+        javaArguments.add("-Dclient.platform=android");
         LaunchOptions.Builder builder = new LaunchOptions.Builder()
                 .setGameDir(gameDir)
                 .setJava(javaVersion)

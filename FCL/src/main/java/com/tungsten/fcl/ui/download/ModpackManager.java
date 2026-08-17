@@ -2,6 +2,7 @@ package com.tungsten.fcl.ui.download;
 
 import android.content.Context;
 
+import com.tungsten.fcl.BuildConfig;
 import com.tungsten.fcl.R;
 import com.tungsten.fcl.setting.DownloadProviders;
 import com.tungsten.fcl.setting.Profile;
@@ -46,8 +47,11 @@ import java.util.stream.Collectors;
  */
 public class ModpackManager {
 
-    /** Root URL of the modpack repository (COS bucket). */
-    public static final String MJY_ROOT = "https://plan-x-modpack-1301840151.cos.ap-shanghai.myqcloud.com/";
+    /**
+     * Root URL of the modpack repository (COS bucket).
+     * 由 buildType 决定：正式包指向正式桶，fortest 包指向测试桶（见 FCL/build.gradle.kts）。
+     */
+    public static final String MJY_ROOT = BuildConfig.MODPACK_ROOT;
 
     private static volatile ModpackManager instance;
 
@@ -73,6 +77,26 @@ public class ModpackManager {
 
     /** Guards against overlapping update checks (e.g. repeated taps on launch). */
     private volatile boolean busy = false;
+
+    /** 见 {@link #checkUpdateAndLaunch(Context, Runnable, Runnable)}，只在主线程读写。 */
+    private Runnable abortAction;
+
+    /** 流程终止且没能启动游戏：解锁 busy 并通知调用方。 */
+    private void abortFlow() {
+        busy = false;
+        Runnable action = abortAction;
+        abortAction = null;
+        if (action != null) {
+            action.run();
+        }
+    }
+
+    /** 流程终止且正常启动游戏：解锁 busy，不回调 abort。 */
+    private void launchNow(Runnable launchAction) {
+        busy = false;
+        abortAction = null;
+        launchAction.run();
+    }
 
     private ModpackManager() {
     }
@@ -348,11 +372,23 @@ public class ModpackManager {
      * If the remote manifest cannot be fetched (e.g. no network) the game is launched
      * anyway with whatever content is already present, so offline play keeps working.
      */
-    public void checkUpdateAndLaunch(Context context, Runnable launchAction) {
+    public boolean checkUpdateAndLaunch(Context context, Runnable launchAction) {
+        return checkUpdateAndLaunch(context, launchAction, null);
+    }
+
+    /**
+     * @param onAbort 流程结束但**没有**启动游戏时回调（失败、取消、没有可用版本）。
+     *                调用方靠它收起自己的 loading 遮罩 —— 启动成功的那条路不会回调，
+     *                因为那时游戏 Activity 已经顶上来了。
+     * @return false 表示上一次流程还没跑完、本次调用被忽略（此时 onAbort **不会**被调用，
+     *         调用方要自己把刚挂上的遮罩收回去，否则界面就永久锁死了）
+     */
+    public boolean checkUpdateAndLaunch(Context context, Runnable launchAction, Runnable onAbort) {
         if (busy) {
-            return;
+            return false;
         }
         busy = true;
+        abortAction = onAbort;
 
         // The modpack files are downloaded into the shared .minecraft directory, so the
         // game must run from that same directory rather than an isolated per-version
@@ -374,18 +410,17 @@ public class ModpackManager {
                         } else if (!isCanUpdateMjyGame()) {
                             // Already up to date: launch immediately.
                             deleteMjyBuf();
-                            busy = false;
-                            launchAction.run();
+                            launchNow(launchAction);
                         } else {
                             installMjyGame(context, launchAction);
                         }
                     } else {
                         // Could not fetch update info: fall back to launching directly.
                         Logging.LOG.log(Level.WARNING, "Failed to fetch modpack info, launching anyway", e);
-                        busy = false;
-                        launchAction.run();
+                        launchNow(launchAction);
                     }
                 }));
+        return true;
     }
 
     /**
@@ -407,20 +442,20 @@ public class ModpackManager {
                             .collect(Collectors.toList());
                     if (forgeVersions.isEmpty()) {
                         Logging.LOG.log(Level.WARNING, "No forge version available for game " + gameVersion);
-                        busy = false;
+                        abortFlow();
                         showInstallFailedDialog(context);
                     } else {
                         installGame(context, name, gameVersion, forgeVersions.get(0), launchAction);
                     }
                 } else {
                     Logging.LOG.log(Level.WARNING, "Failed to fetch forge version list", exception);
-                    busy = false;
+                    abortFlow();
                     showInstallFailedDialog(context);
                 }
             }));
         } catch (Exception e) {
             Logging.LOG.log(Level.WARNING, "Failed to install game", e);
-            busy = false;
+            abortFlow();
             showInstallFailedDialog(context);
         }
     }
@@ -453,7 +488,7 @@ public class ModpackManager {
                             // Game body installed: now download the modpack, then launch.
                             installMjyGame(context, launchAction);
                         } else {
-                            busy = false;
+                            abortFlow();
                             if (executor.getException() != null) {
                                 showInstallFailedDialog(context);
                             }
@@ -466,7 +501,7 @@ public class ModpackManager {
             executor.start();
         } catch (Exception e) {
             Logging.LOG.log(Level.WARNING, "Failed to install game", e);
-            busy = false;
+            abortFlow();
             showInstallFailedDialog(context);
         }
     }
@@ -488,10 +523,10 @@ public class ModpackManager {
                 @Override
                 public void onStop(boolean success, TaskExecutor executor) {
                     Schedulers.androidUIThread().execute(() -> {
-                        busy = false;
                         if (success) {
-                            launchAction.run();
+                            launchNow(launchAction);
                         } else {
+                            abortFlow();
                             saveMjyBuf();
                             if (executor.getException() != null) {
                                 showInstallFailedDialog(context);
@@ -506,8 +541,7 @@ public class ModpackManager {
         } catch (Exception e) {
             // Never leave the launch button permanently blocked: fall back to launching.
             Logging.LOG.log(Level.WARNING, "Failed to start modpack download, launching anyway", e);
-            busy = false;
-            launchAction.run();
+            launchNow(launchAction);
         }
     }
 

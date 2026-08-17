@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 铺在浅色面板（bg_side_panel）上的列表选中态。
+     通用的 bg_container_transparent_selected 用的是 25% 不透明的近白色，
+     压在深色背景图上才显得亮；压在浅灰面板上几乎看不出选中与未选中的区别。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape>
+            <corners android:radius="8dp" />
+            <solid android:color="@android:color/darker_gray" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="8dp" />
+            <solid android:color="@color/ui_panel_selected_color" />
+        </shape>
+    </item>
+</selector>
